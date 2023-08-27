@@ -13,8 +13,30 @@ android_app {
 
     sdk_version: "current",
     product_specific: true,
+    certificate: "platform",
+    privileged: true,
 
     optimize: {
         proguard_flags_files: ["proguard.flags"],
     },
+    required: [
+        "mx.xperience.euicc.xml",
+        "hidden-api-whitelist-mx.xperience.euicc.xml",
+    ],
+}
+
+prebuilt_etc {
+    sub_dir: "permissions",
+    name: "mx.xperience.euicc.xml",
+    filename: "mx.xperience.euicc.xml",
+    src: "mx.xperience.euicc.xml",
+    product_specific: true,
+}
+
+prebuilt_etc {
+    sub_dir: "sysconfig",
+    name: "hidden-api-whitelist-mx.xperience.euicc.xml",
+    filename: "hidden-api-whitelist-mx.xperience.euicc.xml",
+    src: "hidden-api-whitelist-mx.xperience.euicc.xml",
+    product_specific: true,
 }
