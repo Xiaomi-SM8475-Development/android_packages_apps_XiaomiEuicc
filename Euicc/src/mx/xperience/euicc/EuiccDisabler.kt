@@ -6,6 +6,7 @@
 package mx.xperience.euicc
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PackageInfoFlags
 import android.util.Log
@@ -23,10 +24,15 @@ object EuiccDisabler {
         "com.google.android.ims",
     )
 
+    private fun isInstalled(pm: PackageManager, pkgName: String) = runCatching {
+        val info = pm.getPackageInfo(pkgName, PackageInfoFlags.of(0))
+        ((info.applicationInfo?.flags ?: 0) and ApplicationInfo.FLAG_INSTALLED) != 0
+    }.getOrDefault(false)
+
     private fun isInstalledAndEnabled(pm: PackageManager, pkgName: String) = runCatching {
         val info = pm.getPackageInfo(pkgName, PackageInfoFlags.of(0))
-        Log.d(TAG, "package $pkgName installed, enabled = ${info.applicationInfo.enabled}")
-        info.applicationInfo.enabled
+        Log.d(TAG, "package $pkgName installed, enabled = ${info.applicationInfo?.enabled == true}")
+        info.applicationInfo?.enabled == true
     }.getOrDefault(false)
 
     fun enableOrDisableEuicc(context: Context) {
@@ -39,7 +45,9 @@ object EuiccDisabler {
         }
 
         for (pkg in EUICC_PACKAGES) {
-            pm.setApplicationEnabledSetting(pkg, flag, 0)
+            if (isInstalled(pm, pkg)) {
+                pm.setApplicationEnabledSetting(pkg, flag, 0)
+            }
         }
     }
 }
